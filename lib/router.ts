@@ -8,6 +8,7 @@
 
 import {
   STATIONS,
+  COORDS,
   SEGMENTS,
   SCHEDULES,
   HIGHLIGHTS,
@@ -30,6 +31,16 @@ const FACTOR_BY_MODE: Record<MoroccoMode, number> = {
 const CAR_FACTOR = 0.218; // voiture thermique moyenne (ADEME)
 const PLANE_FACTOR = 0.26; // avion court-courrier (ADEME, ordre de grandeur)
 const PLANE_MIN_KM = 400;
+const ROAD_DETOUR = 1.3; // la route est en moyenne 30 % plus longue que le vol d'oiseau
+
+/** Distance a vol d'oiseau entre deux gares (haversine), en km. */
+export function crowKm(a: string, b: string): number {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const [la1, lo1] = COORDS[a];
+  const [la2, lo2] = COORDS[b];
+  const h = Math.sin(rad(la2 - la1) / 2) ** 2 + Math.cos(rad(la1)) * Math.cos(rad(la2)) * Math.sin(rad(lo2 - lo1) / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
 
 export interface LegStop {
   station: string;
@@ -47,7 +58,6 @@ export interface Leg {
   distanceKm: number;
   transferBeforeMin: number;
   frequency: string;
-  sampleDepartures: string[];
   stops: LegStop[];
 }
 
@@ -163,18 +173,16 @@ function buildTrip(origin: string, destination: string, path: PathSeg[]): Trip {
     }
   }
 
+  // Fil d'ariane en temps ecoule depuis le depart (+0h50), correspondances
+  // comprises. Pas d'heure d'horloge : les horaires reels sont sur oncf.ma.
+  let cursor = 0;
   const legs: Leg[] = raw.map((leg) => {
     const sched = SCHEDULES[leg.line] ?? { frequency: "", departures: [] };
-    // Fil d'ariane : horaires theoriques cumules depuis le premier depart.
-    const first = sched.departures[0] ?? "08:00";
-    let cursor = parseInt(first.slice(0, 2), 10) * 60 + parseInt(first.slice(3, 5), 10);
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const stops: LegStop[] = [
-      { station: STATIONS[leg.segments[0][0]].name, time: `${pad(Math.floor(cursor / 60))}:${pad(cursor % 60)}`, kind: "depart" },
-    ];
+    cursor += leg.transferBeforeMin;
+    const stops: LegStop[] = [{ station: STATIONS[leg.segments[0][0]].name, time: `+${formatMin(cursor)}`, kind: "depart" }];
     for (const [, segTo, dur] of leg.segments) {
       cursor += dur;
-      stops.push({ station: STATIONS[segTo].name, time: `${pad(Math.floor(cursor / 60) % 24)}:${pad(cursor % 60)}`, kind: "arret" });
+      stops.push({ station: STATIONS[segTo].name, time: `+${formatMin(cursor)}`, kind: "arret" });
     }
     stops[stops.length - 1].kind = "arrivee";
     return {
@@ -187,7 +195,6 @@ function buildTrip(origin: string, destination: string, path: PathSeg[]): Trip {
       distanceKm: leg.distanceKm,
       transferBeforeMin: leg.transferBeforeMin,
       frequency: sched.frequency,
-      sampleDepartures: sched.departures.slice(0, 4),
       stops,
     };
   });
@@ -204,23 +211,24 @@ function buildTrip(origin: string, destination: string, path: PathSeg[]): Trip {
     totalInVehicleMin: totalInVehicle,
     totalMin: totalInVehicle + totalTransfers,
     totalDistanceKm: totalKm,
-    carbon: carbonComparison(totalKm, legs),
+    carbon: carbonComparison(crowKm(origin, destination), legs),
     lastMile: LAST_MILE[STATIONS[destination].city] ?? [],
     destinationHighlight: HIGHLIGHTS[destination] ?? null,
     disclaimer: DISCLAIMER,
   };
 }
 
-function carbonComparison(totalKm: number, legs: Leg[]): CarbonCompare {
+/** Voiture et avion sont compares sur LEUR distance, pas sur les km du rail. */
+function carbonComparison(crow: number, legs: Leg[]): CarbonCompare {
   const round1 = (n: number) => Math.round(n * 10) / 10;
   const tripKg = legs.reduce((s, l) => s + l.distanceKm * (FACTOR_BY_MODE[l.mode] ?? 0.03), 0);
-  const carKg = totalKm * CAR_FACTOR;
+  const carKg = crow * ROAD_DETOUR * CAR_FACTOR;
   return {
     tripKg: round1(tripKg),
     carKg: round1(carKg),
     savedVsCarKg: round1(Math.max(carKg - tripKg, 0)),
-    planeKg: totalKm >= PLANE_MIN_KM ? round1(totalKm * PLANE_FACTOR) : null,
-    note: "Ordres de grandeur, facteurs moyens génériques (non spécifiques au mix électrique marocain).",
+    planeKg: crow >= PLANE_MIN_KM ? round1(crow * PLANE_FACTOR) : null,
+    note: "Ordres de grandeur, facteurs moyens génériques (non spécifiques au mix électrique marocain). Voiture : distance à vol d'oiseau majorée de 30 %. Avion : distance à vol d'oiseau.",
   };
 }
 

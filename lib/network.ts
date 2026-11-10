@@ -31,6 +31,22 @@ export const STATIONS: Record<string, Station> = {
   chefchaouen: { key: "chefchaouen", name: "Chefchaouen", city: "Chefchaouen", kind: "hub_connecteur" },
 };
 
+/** Coordonnees approximatives des gares (latitude, longitude), pour les distances a vol d'oiseau. */
+export const COORDS: Record<string, [number, number]> = {
+  tanger: [35.77, -5.79],
+  kenitra: [34.26, -6.58],
+  rabat: [34.0, -6.85],
+  casa: [33.59, -7.59],
+  aeroport: [33.37, -7.59],
+  marrakech: [31.63, -8.02],
+  meknes: [33.89, -5.55],
+  fes: [34.05, -5.0],
+  oujda: [34.68, -1.91],
+  essaouira: [31.51, -9.77],
+  ouarzazate: [30.92, -6.9],
+  chefchaouen: [35.17, -5.27],
+};
+
 /** (depart, arrivee, ligne, mode, duree_min, distance_km_estimee, operateur), bidirectionnel */
 export const SEGMENTS: [string, string, string, MoroccoMode, number, number, string][] = [
   // Al Boraq : LGV Tanger - Casablanca, 320 km/h
@@ -180,7 +196,7 @@ export const LAST_MILE: Record<string, TransportHub[]> = {
   ],
 };
 
-export const DISCLAIMER = "Durées commerciales indicatives ONCF, distances estimées, horaires théoriques à vérifier sur oncf.ma.";
+export const DISCLAIMER = "Durées commerciales indicatives ONCF, distances estimées, fréquences approximatives. Horaires réels sur oncf.ma.";
 
 /* ── Traductions anglaises (i18n /en) ────────────────────────────────── */
 
@@ -267,7 +283,7 @@ export const LAST_MILE_EN: Record<string, TransportHub[]> = {
   ],
 };
 
-export const DISCLAIMER_EN = "Indicative ONCF commercial durations, estimated distances, theoretical timetables to check on oncf.ma.";
+export const DISCLAIMER_EN = "Indicative ONCF commercial durations, estimated distances, approximate frequencies. Real timetables on oncf.ma.";
 
 /** English line frequencies (display only). */
 export const FREQUENCY_EN: Record<string, string> = {

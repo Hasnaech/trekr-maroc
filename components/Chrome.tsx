@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { T, localePrefix, type Locale } from "@/lib/i18n";
-import Concierge from "@/components/Concierge";
+import { REPORT_URL } from "@/lib/site";
 
 /** Header + footer localises. Le lien de langue bascule FR <-> EN. */
 export function Chrome({ locale, children }: { locale: Locale; children: React.ReactNode }) {
@@ -8,6 +8,7 @@ export function Chrome({ locale, children }: { locale: Locale; children: React.R
   const p = localePrefix(locale);
   const otherLocale: Locale = locale === "fr" ? "en" : "fr";
   const otherHref = otherLocale === "en" ? "/en" : "/";
+  // Changement de langue = changement de layout racine (lang du <html>) : lien classique.
   const otherLabel = otherLocale === "en" ? "EN" : "FR";
 
   return (
@@ -25,6 +26,8 @@ export function Chrome({ locale, children }: { locale: Locale; children: React.R
               { href: `${p}/circuits`, label: t.circuits },
               { href: `${p}/aeroport`, label: t.airport },
               { href: `${p}/2030`, label: t.wc2030 },
+              { href: `${p}/carbone`, label: locale === "fr" ? "Carbone" : "Carbon" },
+              { href: `${p}/mission`, label: "Mission" },
             ].map((l) => (
               <Link
                 key={l.href}
@@ -57,10 +60,18 @@ export function Chrome({ locale, children }: { locale: Locale; children: React.R
             .
           </p>
           <p className="text-xs text-muted-foreground">{t.footerHonesty}</p>
+          <p className="text-xs text-muted-foreground">
+            <Link href={`${p}/mission`} className="text-accent hover:underline">
+              {locale === "fr" ? "Projet d'utilité publique : gratuit, sans publicité, sans traceur" : "Public-interest project: free, no ads, no trackers"}
+            </Link>
+            {" · "}
+            <a href={REPORT_URL} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+              {locale === "fr" ? "Signaler une erreur" : "Report an error"}
+            </a>
+          </p>
         </div>
       </footer>
 
-      <Concierge locale={locale} />
     </>
   );
 }

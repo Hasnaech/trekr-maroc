@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TrainFront, Bus, Leaf, MapPin, Clock, ArrowRight, Landmark, ExternalLink } from "lucide-react";
+import { TrainFront, Bus, Leaf, MapPin, Clock, ArrowRight, Landmark } from "lucide-react";
 import { formatMin, type Trip, type Leg } from "@/lib/router";
 import {
   STATIONS,
@@ -15,7 +15,6 @@ import {
 } from "@/lib/network";
 import { immersionFor, type ImmersionItem } from "@/lib/immersion";
 import { visitTipsForCity } from "@/lib/visitTips";
-import { experiencesUrl, staysUrl, hasAffiliation, affiliateDisclosure } from "@/lib/affiliates";
 import { T, localePrefix, type Locale } from "@/lib/i18n";
 import CityImage from "@/components/CityImage";
 
@@ -89,16 +88,12 @@ export default function TrainView({ trip, locale }: { trip: Trip; locale: Locale
               <a href="https://www.greenkey.global" target="_blank" rel="noopener noreferrer" className="text-xs text-accent font-medium hover:underline">
                 {t.greenKeyDirectory}
               </a>
-              <a href={staysUrl(trip.destination.city)} target="_blank" rel="noopener noreferrer" className="text-xs text-accent font-medium hover:underline">
-                {t.seeStays} {trip.destination.city}
-              </a>
             </div>
             {BLUE_FLAG[trip.destination.city] && (
               <p className="text-xs text-muted-foreground leading-relaxed mt-3 pt-3 border-t border-border/60">
                 🏖️ {BLUE_FLAG[trip.destination.city][locale]}
               </p>
             )}
-            {hasAffiliation() && <p className="text-[9px] text-muted-foreground mt-2">{affiliateDisclosure}</p>}
           </div>
 
           {/* Immersion */}
@@ -144,19 +139,9 @@ export default function TrainView({ trip, locale }: { trip: Trip; locale: Locale
               )}
 
               <div className="pt-1 border-t border-border space-y-1.5">
-                <a
-                  href={experiencesUrl(trip.destination.city)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-accent font-semibold hover:underline inline-flex items-center gap-1"
-                >
-                  {t.bookExperiences} {trip.destination.city}
-                  <ExternalLink className="w-3 h-3" aria-hidden="true" />
-                </a>
-                {hasAffiliation() && <p className="text-[9px] text-muted-foreground">{affiliateDisclosure}</p>}
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" aria-hidden="true" />
-                  <p className="text-[9px] text-muted-foreground italic">{t.verifiedData}</p>
+                  <p className="text-[11px] text-muted-foreground italic">{t.verifiedData}</p>
                 </div>
               </div>
             </div>
@@ -180,7 +165,7 @@ export default function TrainView({ trip, locale }: { trip: Trip; locale: Locale
             </p>
             <p className="text-[10px] text-muted-foreground mt-2">
               {en
-                ? "Orders of magnitude, generic average factors (not specific to Morocco's electricity mix)."
+                ? "Orders of magnitude, generic average factors (not specific to Morocco's electricity mix). Car: straight-line distance plus 30%. Plane: straight-line distance."
                 : trip.carbon.note}
             </p>
           </div>
@@ -280,9 +265,9 @@ function LegItem({ leg, locale }: { leg: Leg; locale: Locale }) {
             {leg.fromName} → {leg.toName}
             <span className="text-muted-foreground"> · {formatMin(leg.durationMin)} · {leg.distanceKm} {t.estimatedKm}</span>
           </p>
-          {leg.sampleDepartures.length > 0 && (
+          {frequency && (
             <p className="text-xs text-muted-foreground mt-1">
-              {t.theoreticalDepartures} : {leg.sampleDepartures.join(", ")} · {frequency}
+              {t.theoreticalDepartures} : {frequency}
             </p>
           )}
           {leg.stops.length > 2 && (

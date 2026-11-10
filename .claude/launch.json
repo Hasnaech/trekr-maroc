@@ -4,9 +4,11 @@
     {
       "name": "trekr-maroc",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000,
-      "cwd": "/Users/hasnae/Desktop/carbon 3/trekr-maroc"
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3000
     }
   ]
 }

@@ -29,9 +29,9 @@ export default function CityImage({ cityKey, city }: { cityKey: string; city: st
   if (info) {
     return (
       <div className="relative h-32 w-full">
-        <Image src={info.src} alt={info.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+        <Image src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${info.src}`} alt={info.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" aria-hidden="true" />
-        <p className="absolute bottom-1 right-2 text-[8px] text-white/75">
+        <p className="absolute bottom-1 right-2 text-[11px] text-white/85">
           <a href={info.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
             {info.credit}
           </a>

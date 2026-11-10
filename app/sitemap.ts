@@ -1,16 +1,19 @@
 import type { MetadataRoute } from "next";
 import { allRoutePairs } from "@/lib/router";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * Sitemap bilingue : pages piliers FR + EN et les axes dans les deux langues.
  * NEXT_PUBLIC_SITE_URL a definir au deploiement.
  */
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const base = SITE_URL;
   const now = new Date();
   const pairs = allRoutePairs();
 
-  const staticPaths = ["", "/circuits", "/aeroport", "/2030"];
+  const staticPaths = ["", "/circuits", "/aeroport", "/2030", "/carbone", "/mission"];
 
   return [
     ...staticPaths.map((path) => ({ url: `${base}${path || "/"}`, lastModified: now, priority: path === "" ? 1 : 0.9 })),

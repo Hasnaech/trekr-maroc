@@ -2,12 +2,12 @@
   "name": "trekr-maroc",
   "version": "1.0.0",
   "private": true,
-  "description": "Trekr : le compagnon de voyage IA du Maroc. Itineraires ONCF reels, immersion locale, impact carbone.",
+  "description": "Trekr : le Maroc en train, guide libre et gratuit. Projet d'utilite publique, sans publicite, sans traceur, donnees ouvertes.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "npx serve out",
+    "test": "node --import ./tests/resolve-ts.mjs --test tests/*.test.ts"
   },
   "dependencies": {
     "lucide-react": "^0.516.0",
@@ -23,5 +23,6 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.10",
     "typescript": "^5.8.3"
-  }
+  },
+  "license": "MIT"
 }
