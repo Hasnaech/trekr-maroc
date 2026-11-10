@@ -59,7 +59,7 @@ npm run build   # 281 pages statiques dans out/
 
 ## Prochaines briques (par utilite, pas par revenu)
 
-1. Mise en ligne GitHub Pages (accord d'Hasnae requis pour rendre public).
+1. EN LIGNE depuis le 10 novembre 2026 : https://hasnaech.github.io/trekr-maroc/ (chaque push sur main republie). Reste : Search Console + sitemap.
 2. Verifier durees et frequences sur oncf-voyages.ma, liaison par liaison.
 3. Version arabe / darija des pages (aujourd'hui seule la recherche comprend la darija).
 4. Source pour "19,8 millions de visiteurs en 2025" (i18n.ts) ou retrait.
